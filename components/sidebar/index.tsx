@@ -7,7 +7,7 @@ import { ResizeHandle } from "./resize-handle";
 import { NewChatButton } from "./new-chat-button";
 import { ToggleButton } from "./toggle-button";
 import { useSidebarResize } from "@/hooks";
-import type { ChatMessage } from "@/types";
+import type { ChatMessage, DecisionPayload } from "@/types";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,6 +16,8 @@ interface SidebarProps {
   isLoading: boolean;
   onSendMessage: (message: string) => void;
   onNewChat: () => void;
+  activeDecision?: DecisionPayload | null;
+  onSubmitDecision?: (decisionId: string, optionId: string, optionTitle: string) => void;
 }
 
 export function Sidebar({
@@ -25,6 +27,8 @@ export function Sidebar({
   isLoading,
   onSendMessage,
   onNewChat,
+  activeDecision,
+  onSubmitDecision,
 }: SidebarProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { width, isResizing, startResizing, resize } = useSidebarResize();
@@ -37,6 +41,9 @@ export function Sidebar({
     },
     [isResizing, resize]
   );
+
+  // Disable input when there's an active decision awaiting user choice (status = "ready")
+  const isInputDisabled = isLoading || (activeDecision?.status === "ready");
 
   return (
     <>
@@ -67,10 +74,14 @@ export function Sidebar({
             </div>
 
             {/* Messages */}
-            <MessageList messages={messages} isLoading={isLoading} />
+            <MessageList 
+              messages={messages} 
+              isLoading={isLoading} 
+              onSelectOption={onSubmitDecision}
+            />
 
             {/* Input */}
-            <ChatInput onSend={onSendMessage} disabled={isLoading} />
+            <ChatInput onSend={onSendMessage} disabled={isInputDisabled} />
 
             {/* Resize handle */}
             <ResizeHandle onMouseDown={startResizing} />

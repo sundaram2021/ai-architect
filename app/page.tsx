@@ -9,7 +9,14 @@ import type { ArchitectureData } from "@/types";
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  const { messages, isLoading, sendMessage, clearMessages } = useChatSession();
+  const { 
+    messages, 
+    isLoading, 
+    sendMessage, 
+    clearMessages,
+    activeDecision,
+    submitDecision,
+  } = useChatSession();
   const {
     canvasState,
     nodes,
@@ -40,6 +47,16 @@ export default function Home() {
     setSidebarOpen((prev) => !prev);
   }, []);
 
+  const handleSubmitDecision = useCallback(
+    (decisionId: string, optionId: string, optionTitle: string) => {
+      setLoading();
+      submitDecision(decisionId, optionId, optionTitle, (data) => {
+        setArchitecture(data as ArchitectureData);
+      });
+    },
+    [submitDecision, setLoading, setArchitecture]
+  );
+
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar
@@ -49,6 +66,8 @@ export default function Home() {
         isLoading={isLoading}
         onSendMessage={handleSendMessage}
         onNewChat={handleNewChat}
+        activeDecision={activeDecision}
+        onSubmitDecision={handleSubmitDecision}
       />
       <Canvas
         state={canvasState}

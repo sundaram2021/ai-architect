@@ -17,17 +17,17 @@ const nodeTypes = {
 };
 
 const defaultEdgeOptions = {
-  type: "smoothstep",
+  type: "bezier",
   animated: false,
   style: { 
-    stroke: "#374151", 
-    strokeWidth: 2,
+    stroke: "#6b7280", 
+    strokeWidth: 1.5,
   },
   markerEnd: {
     type: MarkerType.ArrowClosed,
-    color: "#374151",
-    width: 20,
-    height: 20,
+    color: "#9ca3af",
+    width: 16,
+    height: 16,
   },
 };
 
@@ -67,7 +67,7 @@ export function DesignCanvas({
       >
         <Background color="rgba(55, 65, 81, 0.3)" gap={20} />
         <Controls 
-          className="bg-zinc-900! border-zinc-700! rounded-lg! [&>button]:bg-zinc-800! [&>button]:border-zinc-700! [&>button]:text-zinc-400! [&>button:hover]:bg-zinc-700!" 
+          className="bg-zinc-900! border-zinc-700! rounded-lg! [&>button]:bg-zinc-800! [&>button]:border-zinc-700! [&>button]:text-zinc-300! [&>button:hover]:bg-zinc-700! [&>button>svg]:fill-zinc-300!" 
           showInteractive={false}
         />
       </ReactFlow>

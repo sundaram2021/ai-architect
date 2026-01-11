@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 
-const MIN_WIDTH = 240;
-const MAX_WIDTH = 520;
-const DEFAULT_WIDTH = 320;
+const MIN_WIDTH = 360;
+const MAX_WIDTH = 720;
+const DEFAULT_WIDTH = 480;
 
 export function useSidebarResize() {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
