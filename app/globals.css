@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #fafafa;
 }
 
 @theme inline {
@@ -12,15 +12,98 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Blueprint drawing animation */
+@keyframes draw {
+  0% {
+    stroke-dashoffset: 400;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -400;
+  }
+}
+
+/* Delay utilities for animations */
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+/* React Flow custom styles for dark theme */
+.react-flow__node {
+  cursor: grab;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__node.selected {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.react-flow__edge-path {
+  stroke: #374151;
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #60a5fa;
+}
+
+.react-flow__handle {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.react-flow__node:hover .react-flow__handle {
+  opacity: 1;
+}
+
+.react-flow__background {
+  background-color: #0a0a0a;
+}
+
+.react-flow__controls {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.react-flow__controls button {
+  background-color: #18181b;
+  border-color: #27272a;
+  color: #a1a1aa;
+}
+
+.react-flow__controls button:hover {
+  background-color: #27272a;
+}
+
+.react-flow__controls button svg {
+  fill: currentColor;
+}
+
+@keyframes dashdraw {
+  from {
+    stroke-dashoffset: 10;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
