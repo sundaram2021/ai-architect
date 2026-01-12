@@ -3,7 +3,6 @@
 export function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-full">
-      {/* Architect Logo */}
       <div className="relative mb-8">
         <div className="w-24 h-24 border-2 border-purple-500/60 rotate-45 
                         flex items-center justify-center">
@@ -11,18 +10,15 @@ export function EmptyState() {
         </div>
       </div>
 
-      {/* Title */}
       <h1 className="text-4xl font-light text-purple-100 tracking-wide mb-4">
         AI Architect
       </h1>
 
-      {/* Description */}
       <p className="text-purple-400/70 text-center max-w-md text-sm leading-relaxed">
         Design, visualize, and iterate on system architectures with AI-powered assistance.
         Describe your system and watch it come to life.
       </p>
 
-      {/* Hint */}
       <div className="mt-12 text-purple-500/50 text-xs flex items-center gap-2">
         <svg
           width="16"

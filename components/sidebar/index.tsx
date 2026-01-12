@@ -7,17 +7,21 @@ import { ResizeHandle } from "./resize-handle";
 import { NewChatButton } from "./new-chat-button";
 import { ToggleButton } from "./toggle-button";
 import { useSidebarResize } from "@/hooks";
-import type { ChatMessage, DecisionPayload } from "@/types";
+import type { AgentMessage, ActivityEvent, ClarifyingQuestion, ResearchAgentOutput } from "@/lib/agents";
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
-  messages: ChatMessage[];
+  messages: AgentMessage[];
   isLoading: boolean;
   onSendMessage: (message: string) => void;
   onNewChat: () => void;
-  activeDecision?: DecisionPayload | null;
-  onSubmitDecision?: (decisionId: string, optionId: string, optionTitle: string) => void;
+  activities?: ActivityEvent[];
+  currentActivity?: ActivityEvent | null;
+  activeQuestion?: ClarifyingQuestion | null;
+  onAnswerQuestion?: (value: string) => void;
+  activeResearch?: ResearchAgentOutput | null;
+  onSelectResearchOption?: (optionId: string, optionName: string, topic: string) => void;
 }
 
 export function Sidebar({
@@ -27,8 +31,12 @@ export function Sidebar({
   isLoading,
   onSendMessage,
   onNewChat,
-  activeDecision,
-  onSubmitDecision,
+  activities = [],
+  currentActivity,
+  activeQuestion,
+  onAnswerQuestion,
+  activeResearch,
+  onSelectResearchOption,
 }: SidebarProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { width, isResizing, startResizing, resize } = useSidebarResize();
@@ -42,19 +50,16 @@ export function Sidebar({
     [isResizing, resize]
   );
 
-  // Disable input when there's an active decision awaiting user choice (status = "ready")
-  const isInputDisabled = isLoading || (activeDecision?.status === "ready");
+  const isInputDisabled = isLoading || !!activeQuestion || !!activeResearch;
 
   return (
     <>
-      {/* Toggle button when sidebar is closed */}
       {!isOpen && (
         <div className="absolute top-3 left-3 z-20">
           <ToggleButton isOpen={isOpen} onClick={onToggle} />
         </div>
       )}
 
-      {/* Sidebar */}
       <div
         ref={sidebarRef}
         onMouseMove={handleMouseMove}
@@ -65,7 +70,6 @@ export function Sidebar({
       >
         {isOpen && (
           <>
-            {/* Header */}
             <div className="flex items-center justify-between p-3 border-b border-purple-500/30">
               <div className="flex items-center gap-2">
                 <ToggleButton isOpen={isOpen} onClick={onToggle} />
@@ -73,17 +77,19 @@ export function Sidebar({
               </div>
             </div>
 
-            {/* Messages */}
             <MessageList 
               messages={messages} 
-              isLoading={isLoading} 
-              onSelectOption={onSubmitDecision}
+              isLoading={isLoading}
+              activities={activities}
+              currentActivity={currentActivity}
+              activeQuestion={activeQuestion}
+              activeResearch={activeResearch}
+              onAnswerQuestion={onAnswerQuestion}
+              onSelectResearchOption={onSelectResearchOption}
             />
 
-            {/* Input */}
-            <ChatInput onSend={onSendMessage} disabled={isInputDisabled} />
+            <ChatInput onSend={onSendMessage} disabled={isInputDisabled} isLoading={isLoading} />
 
-            {/* Resize handle */}
             <ResizeHandle onMouseDown={startResizing} />
           </>
         )}

@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Canvas } from "@/components/canvas";
 import { useChatSession, useCanvasState } from "@/hooks";
-import type { ArchitectureData } from "@/types";
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,9 +13,14 @@ export default function Home() {
     isLoading, 
     sendMessage, 
     clearMessages,
-    activeDecision,
-    submitDecision,
+    activities,
+    currentActivity,
+    activeQuestion,
+    answerQuestion,
+    activeResearch,
+    selectResearchOption,
   } = useChatSession();
+  
   const {
     canvasState,
     nodes,
@@ -31,9 +35,7 @@ export default function Home() {
   const handleSendMessage = useCallback(
     (message: string) => {
       setLoading();
-      sendMessage(message, (data) => {
-        setArchitecture(data as ArchitectureData);
-      });
+      sendMessage(message, setArchitecture);
     },
     [sendMessage, setLoading, setArchitecture]
   );
@@ -47,14 +49,20 @@ export default function Home() {
     setSidebarOpen((prev) => !prev);
   }, []);
 
-  const handleSubmitDecision = useCallback(
-    (decisionId: string, optionId: string, optionTitle: string) => {
+  const handleAnswerQuestion = useCallback(
+    (value: string) => {
       setLoading();
-      submitDecision(decisionId, optionId, optionTitle, (data) => {
-        setArchitecture(data as ArchitectureData);
-      });
+      answerQuestion(value, setArchitecture);
     },
-    [submitDecision, setLoading, setArchitecture]
+    [answerQuestion, setLoading, setArchitecture]
+  );
+
+  const handleSelectResearchOption = useCallback(
+    (optionId: string, optionName: string, topic: string) => {
+      setLoading();
+      selectResearchOption(optionId, optionName, topic, setArchitecture);
+    },
+    [selectResearchOption, setLoading, setArchitecture]
   );
 
   return (
@@ -66,8 +74,12 @@ export default function Home() {
         isLoading={isLoading}
         onSendMessage={handleSendMessage}
         onNewChat={handleNewChat}
-        activeDecision={activeDecision}
-        onSubmitDecision={handleSubmitDecision}
+        activities={activities}
+        currentActivity={currentActivity}
+        activeQuestion={activeQuestion}
+        onAnswerQuestion={handleAnswerQuestion}
+        activeResearch={activeResearch}
+        onSelectResearchOption={handleSelectResearchOption}
       />
       <Canvas
         state={canvasState}

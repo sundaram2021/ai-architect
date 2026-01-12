@@ -16,7 +16,6 @@ export function DecisionCard({ decision, onSelectOption, disabled }: DecisionCar
 
   return (
     <div className="rounded-lg border-l-4 border-purple-500 bg-zinc-900/80 overflow-hidden">
-      {/* Header */}
       <div className="p-3 border-b border-zinc-800">
         <div className="flex items-start gap-2">
           <div className="p-1.5 bg-purple-600/20 rounded">
@@ -45,7 +44,6 @@ export function DecisionCard({ decision, onSelectOption, disabled }: DecisionCar
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-3">
         {isResearching ? (
           <ResearchStatus />
@@ -65,7 +63,6 @@ export function DecisionCard({ decision, onSelectOption, disabled }: DecisionCar
         )}
       </div>
 
-      {/* Footer hint */}
       {!isResearching && !isSelected && (
         <div className="px-3 pb-3">
           <p className="text-[10px] text-zinc-600 text-center">

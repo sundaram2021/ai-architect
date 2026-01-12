@@ -1,65 +1,156 @@
 "use client";
 
-import type { ChatMessage } from "@/types";
+import { useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { DecisionCard } from "./decision-card";
+import { ActivityFeed } from "./activity-feed";
+import { QuestionCard } from "./question-card";
+import { ResearchCard } from "./research-card";
+import type { AgentMessage, ActivityEvent, ClarifyingQuestion, ResearchAgentOutput } from "@/lib/agents";
 
 interface MessageListProps {
-  messages: ChatMessage[];
+  messages: AgentMessage[];
   isLoading?: boolean;
-  onSelectOption?: (decisionId: string, optionId: string, optionTitle: string) => void;
+  activities?: ActivityEvent[];
+  currentActivity?: ActivityEvent | null;
+  activeQuestion?: ClarifyingQuestion | null;
+  activeResearch?: ResearchAgentOutput | null;
+  onAnswerQuestion?: (value: string) => void;
+  onSelectResearchOption?: (optionId: string, optionName: string, topic: string) => void;
 }
 
-export function MessageList({ messages, isLoading, onSelectOption }: MessageListProps) {
-  if (messages.length === 0) {
+export function MessageList({ 
+  messages, 
+  isLoading, 
+  activities = [],
+  currentActivity,
+  activeQuestion,
+  activeResearch,
+  onAnswerQuestion,
+  onSelectResearchOption,
+}: MessageListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isLoading, currentActivity]);
+
+  if (messages.length === 0 && !isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center p-4">
-        <p className="text-purple-400/50 text-sm text-center">
-          Describe the system you want to architect
-        </p>
+        <div className="text-center space-y-2">
+          <div className="text-4xl mb-3">🏗️</div>
+          <p className="text-purple-300/70 text-sm font-medium">
+            AI Architect
+          </p>
+          <p className="text-zinc-500 text-xs max-w-[200px]">
+            Describe the system you want to build and I&apos;ll help design the architecture
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 space-y-3">
-      {messages.map((message) => (
-        <div key={message.id}>
-          {/* Regular message */}
-          <div
-            className={cn(
-              "rounded-lg px-3 py-2 text-sm",
-              message.role === "user"
-                ? "bg-purple-600/20 text-purple-100 ml-4"
-                : message.role === "system"
-                ? "bg-zinc-700/50 text-zinc-400 text-xs italic"
-                : "bg-zinc-800/80 text-zinc-300 mr-4"
-            )}
+    <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
+      <AnimatePresence mode="popLayout">
+        {messages.map((message, index) => (
+          <motion.div
+            key={message.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
           >
-            <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
-          </div>
-
-          {/* Decision card if present */}
-          {message.decision && onSelectOption && (
-            <div className="mt-2 mr-4">
-              <DecisionCard
-                decision={message.decision}
-                onSelectOption={onSelectOption}
-                disabled={isLoading}
-              />
+            <div
+              className={cn(
+                "rounded-lg px-3 py-2 text-sm",
+                message.role === "user"
+                  ? "bg-purple-600/20 text-purple-100 ml-6 border border-purple-500/20"
+                  : message.role === "system"
+                  ? "bg-zinc-700/50 text-zinc-400 text-xs italic"
+                  : "bg-zinc-800/80 text-zinc-300 mr-6"
+              )}
+            >
+              <p className="whitespace-pre-wrap break-words">{message.content}</p>
             </div>
-          )}
-        </div>
-      ))}
-      {isLoading && (
-        <div className="bg-zinc-800/80 text-zinc-400 rounded-lg px-3 py-2 text-sm mr-4">
-          <span className="inline-flex gap-1">
-            <span className="animate-pulse">Thinking</span>
-            <span className="animate-bounce delay-100">.</span>
-            <span className="animate-bounce delay-200">.</span>
-            <span className="animate-bounce delay-300">.</span>
+
+            {message.question && index === messages.length - 1 && onAnswerQuestion && (
+              <div className="mt-2 mr-6">
+                <QuestionCard
+                  question={message.question}
+                  onAnswer={onAnswerQuestion}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+
+            {message.research && index === messages.length - 1 && onSelectResearchOption && (
+              <div className="mt-2 mr-6">
+                <ResearchCard
+                  research={message.research}
+                  onSelectOption={onSelectResearchOption}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
+      {isLoading && (activities.length > 0 || currentActivity) && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mr-6"
+        >
+          <ActivityFeed 
+            activities={activities}
+            currentActivity={currentActivity}
+          />
+        </motion.div>
+      )}
+
+      {isLoading && activities.length === 0 && !currentActivity && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-zinc-800/80 text-zinc-400 rounded-lg px-3 py-2 text-sm mr-6"
+        >
+          <span className="inline-flex items-center gap-2">
+            <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+            Thinking...
           </span>
-        </div>
+        </motion.div>
+      )}
+
+      {activeQuestion && !messages.some(m => m.question?.id === activeQuestion.id) && onAnswerQuestion && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mr-6"
+        >
+          <QuestionCard
+            question={activeQuestion}
+            onAnswer={onAnswerQuestion}
+            disabled={isLoading}
+          />
+        </motion.div>
+      )}
+
+      {activeResearch && !messages.some(m => m.research?.topic === activeResearch.topic) && onSelectResearchOption && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mr-6"
+        >
+          <ResearchCard
+            research={activeResearch}
+            onSelectOption={onSelectResearchOption}
+            disabled={isLoading}
+          />
+        </motion.div>
       )}
     </div>
   );

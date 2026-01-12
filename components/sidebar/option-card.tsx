@@ -29,14 +29,12 @@ export function OptionCard({
           : "bg-zinc-800/50 border-zinc-700/50 hover:border-zinc-600/50 hover:bg-zinc-800/80"
       } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
     >
-      {/* Recommended badge */}
       {isRecommended && !isSelected && (
         <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-medium rounded-full">
           Recommended
         </div>
       )}
 
-      {/* Selected badge */}
       {isSelected && (
         <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-purple-600 text-white text-[10px] font-medium rounded-full flex items-center gap-1">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -47,7 +45,6 @@ export function OptionCard({
       )}
 
       <div className="p-3">
-        {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <div>
             <h4 className="text-sm font-semibold text-zinc-100">{option.title}</h4>
@@ -55,14 +52,12 @@ export function OptionCard({
           </div>
         </div>
 
-        {/* Best for */}
         {option.bestFor && (
           <p className="text-[11px] text-zinc-500 mb-2">
             <span className="text-zinc-400">Best for:</span> {option.bestFor}
           </p>
         )}
 
-        {/* Expand toggle */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="text-[11px] text-purple-400 hover:text-purple-300 mb-2 flex items-center gap-1"
@@ -81,10 +76,8 @@ export function OptionCard({
           {isExpanded ? "Hide details" : "Show pros & cons"}
         </button>
 
-        {/* Expanded content */}
         {isExpanded && (
           <div className="space-y-3 mt-3 pt-3 border-t border-zinc-700/50">
-            {/* Pros */}
             <div>
               <h5 className="text-[11px] font-medium text-emerald-400 mb-1.5 flex items-center gap-1">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -102,7 +95,6 @@ export function OptionCard({
               </ul>
             </div>
 
-            {/* Cons */}
             <div>
               <h5 className="text-[11px] font-medium text-red-400 mb-1.5 flex items-center gap-1">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -121,7 +113,6 @@ export function OptionCard({
               </ul>
             </div>
 
-            {/* Citations */}
             {option.citations && option.citations.length > 0 && (
               <div>
                 <h5 className="text-[11px] font-medium text-zinc-500 mb-1.5">Sources</h5>
@@ -135,7 +126,6 @@ export function OptionCard({
           </div>
         )}
 
-        {/* Select button */}
         {!isSelected && (
           <button
             onClick={() => onSelect(option.id)}

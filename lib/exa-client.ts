@@ -1,17 +1,14 @@
 import Exa from "exa-js";
 import type { DecisionOption } from "@/types";
 
-// Initialize Exa client
 const exa = new Exa(process.env.EXA_API_KEY);
 
-// Research task configuration
 const RESEARCH_CONFIG = {
   model: "exa-research" as const,
   pollIntervalMs: 3000,
   timeoutMs: 120000,
 };
 
-// Output schema for structured research results
 const DECISION_OUTPUT_SCHEMA = {
   type: "object",
   properties: {
@@ -61,7 +58,6 @@ interface ExaResearchData {
   reasoning: string;
 }
 
-// Create a research task for architectural decisions
 export async function createResearchTask(
   question: string,
   context: string
@@ -82,7 +78,6 @@ export async function createResearchTask(
   }
 }
 
-// Poll and get research results
 export async function getResearchResults(
   researchId: string
 ): Promise<ResearchResult> {
@@ -127,7 +122,7 @@ export async function getResearchResults(
       pros: opt.advantages,
       cons: opt.disadvantages,
       bestFor: opt.bestUseCases.join(", "),
-      citations: [], // Citations would be extracted from output.content if needed
+      citations: [],
     }));
 
     return {
@@ -146,7 +141,6 @@ export async function getResearchResults(
   }
 }
 
-// Execute research and get results in one call (with polling)
 export async function executeResearch(
   question: string,
   context: string
@@ -154,14 +148,12 @@ export async function executeResearch(
   try {
     const instructions = buildResearchInstructions(question, context);
 
-    // Create the research task
     const createResponse = await exa.research.create({
       instructions,
       model: RESEARCH_CONFIG.model,
       outputSchema: DECISION_OUTPUT_SCHEMA,
     });
 
-    // Poll until finished
     const task = await exa.research.pollUntilFinished(
       createResponse.researchId,
       {
@@ -189,7 +181,7 @@ export async function executeResearch(
       pros: opt.advantages,
       cons: opt.disadvantages,
       bestFor: opt.bestUseCases.join(", "),
-      citations: [], // Citations extracted from output if available
+      citations: [],
     }));
 
     return {
@@ -203,7 +195,6 @@ export async function executeResearch(
   }
 }
 
-// Build research instructions
 function buildResearchInstructions(question: string, context: string): string {
   return `
 Research and compare options for the following architectural decision:
@@ -225,11 +216,9 @@ Provide a recommendation with clear reasoning based on the given context.
 `.trim();
 }
 
-// Fallback results when research fails
 function getFallbackResult(question: string, error: unknown): ResearchResult {
   console.warn("Using fallback for research:", question);
 
-  // Provide generic fallback based on question type
   const questionLower = question.toLowerCase();
 
   if (questionLower.includes("database") || questionLower.includes("sql")) {
@@ -326,7 +315,6 @@ function getFallbackResult(question: string, error: unknown): ResearchResult {
     };
   }
 
-  // Generic fallback
   return {
     success: false,
     options: [],
@@ -337,7 +325,6 @@ function getFallbackResult(question: string, error: unknown): ResearchResult {
   };
 }
 
-// Extract error message
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;

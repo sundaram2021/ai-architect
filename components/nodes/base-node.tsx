@@ -15,17 +15,14 @@ export function BaseNode({ data }: NodeProps<BaseNodeData>) {
         className="bg-purple-500! border-purple-400! w-3! h-3!"
       />
       
-      {/* Node type badge */}
       <div className="text-[10px] text-purple-400/70 uppercase tracking-wider mb-1">
         {data.type}
       </div>
       
-      {/* Node label */}
       <div className="text-sm text-purple-100 font-medium">
         {data.label}
       </div>
       
-      {/* Description if available */}
       {data.description && (
         <div className="text-xs text-purple-400/60 mt-1 line-clamp-2">
           {data.description}
